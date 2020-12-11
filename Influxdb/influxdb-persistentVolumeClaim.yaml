@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: influxdb-nfs-pvc
+  namespace: kube-monitoring
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 512Gi
+  selector:
+    matchLabels:
+      volume: influxdb-nfs-pv

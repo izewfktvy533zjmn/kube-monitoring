@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb-dp
+  namespace: kube-monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: influxdb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: influxdb
+    spec:
+      containers:
+      - name: influxdb
+        imagePullPolicy: Always
+        image: influxdb:1.8.0
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8086
+            scheme: HTTP
+          initialDelaySeconds: 180
+          periodSeconds: 3
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+        ports:
+        - containerPort: 8086
+        volumeMounts:
+        - name: influxdb-volume
+          mountPath: /var/lib/influxdb
+      volumes:
+      - name: influxdb-volume
+        persistentVolumeClaim:
+          claimName: influxdb-nfs-pvc
